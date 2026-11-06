@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--
+      Title is LITERAL "TLDR Nano - Settings" (not __MSG_optionsTitle) to
+      dodge the Chrome 150 __MSG_ substitution bug in <title>. See
+      chrome150-msg-bug.md.
+    -->
+    <title>TLDR Nano - Settings</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body class="tldr tldr-root">
+    <div class="tldr-page">
+
+      <!-- Header: wordmark + page eyebrow -->
+      <header class="tldr-page__header">
+        <span class="tldr-brand">
+          <span class="tldr-brand__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                 aria-hidden="true" focusable="false">
+              <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+              <polyline points="14 3 14 9 20 9" />
+              <line x1="8" y1="13" x2="16" y2="13" />
+              <line x1="8" y1="17" x2="13" y2="17" />
+            </svg>
+          </span>
+          <span class="tldr-brand__wordmark">
+            <span class="tldr-brand__name" data-i18n="popupTitle">TLDR Nano</span>
+            <span class="tldr-brand__sub" data-i18n="popupSubtitle">
+              Cut pages to a TL;DR on your device
+            </span>
+          </span>
+        </span>
+        <span class="tldr-page__eyebrow" data-i18n="optionsEyebrow">Settings</span>
+      </header>
+
+      <!-- Three-column layout: nav + main + conversion sidebar -->
+      <div class="tldr-page__body">
+
+        <!-- Sidebar nav -->
+        <nav class="tldr-nav" aria-label="Settings sections">
+          <button type="button" class="tldr-nav__item tldr-nav__item--active"
+                  data-nav="defaults" data-i18n="navDefaults">
+            Defaults
+          </button>
+          <button type="button" class="tldr-nav__item"
+                  data-nav="pro" data-i18n="navPro">
+            Unlock Pro
+          </button>
+          <button type="button" class="tldr-nav__item"
+                  data-nav="onboarding" data-i18n="navOnboarding">
+            Welcome tour
+          </button>
+          <button type="button" class="tldr-nav__item"
+                  data-nav="about" data-i18n="navAbout">
+            About this tool
+          </button>
+        </nav>
+
+        <!-- Main content area -->
+        <main class="tldr-main">
+
+          <!-- Panel: Defaults (visible by default) -->
+          <section class="tldr-panel tldr-panel--active"
+                   data-panel="defaults" aria-labelledby="tldr-opt-defaults-label">
+            <h1 class="tldr-panel__title" id="tldr-opt-defaults-label"
+                data-i18n="panelDefaultsTitle">
+              Get the right summary every time
+            </h1>
+            <p class="tldr-panel__hint" data-i18n="panelDefaultsHint">
+              These apply every time you click Summarize in the side panel.
+              Switch the type and length here once and skip the popup.
+            </p>
+
+            <div class="tldr-form">
+              <div class="tldr-field">
+                <span class="tldr-label" id="opt-type-label"
+                      data-i18n="labelSummaryType">
+                  Summary type
+                </span>
+                <div class="tldr-seg" role="radiogroup"
+                     aria-labelledby="opt-type-label">
+                  <button type="button" class="tldr-seg__item" role="radio"
+                          aria-checked="true" data-summary-type="tl;dr"
+                          data-i18n="typeTldr" aria-label="TL;DR short headline summary">
+                    TL;DR
+                  </button>
+                  <button type="button" class="tldr-seg__item" role="radio"
+                          aria-checked="false" data-summary-type="key-points"
+                          data-pro="true" aria-disabled="true"
+                          data-i18n="typeKeyPoints"
+                          aria-label="Key points bullet list - Pro feature">
+                    Key points <span class="tldr-pro-badge" aria-hidden="true">Pro</span>
+                  </button>
+                  <button type="button" class="tldr-seg__item" role="radio"
+                          aria-checked="false" data-summary-type="teaser"
+                          data-pro="true" aria-disabled="true"
+                          data-i18n="typeTeaser"
+                          aria-label="Teaser one-liner - Pro feature">
+                    Teaser <span class="tldr-pro-badge" aria-hidden="true">Pro</span>
+                  </button>
+                  <button type="button" class="tldr-seg__item" role="radio"
+                          aria-checked="false" data-summary-type="outlines"
+                          data-pro="true" aria-disabled="true"
+                          data-i18n="typeOutlines"
+                          aria-label="Outlines section structure - Pro feature">
+                    Outlines <span class="tldr-pro-badge" aria-hidden="true">Pro</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="tldr-field">
+                <span class="tldr-label" id="opt-length-label"
+                      data-i18n="labelSummaryLength">
+                  Length
+                </span>
+                <div class="tldr-seg" role="radiogroup"
+                     aria-labelledby="opt-length-label">
+                  <button type="button" class="tldr-seg__item" role="radio"
+                          aria-checked="false" data-summary-length="short"
+                          data-pro="true" aria-disabled="true"
+                          data-i18n="lengthShort"
+                          aria-label="Short headline - Pro feature">
+                    Short <span class="tldr-pro-badge" aria-hidden="true">Pro</span>
+                  </button>
+                  <button type="button" class="tldr-seg__item" role="radio"
+                          aria-checked="true" data-summary-length="medium"
+                          data-i18n="lengthMedium" aria-label="Medium paragraph">
+                    Medium
+                  </button>
+                  <button type="button" class="tldr-seg__item" role="radio"
+                          aria-checked="false" data-summary-length="long"
+                          data-pro="true" aria-disabled="true"
+                          data-i18n="lengthLong"
+                          aria-label="Long paragraph - Pro feature">
+                    Long <span class="tldr-pro-badge" aria-hidden="true">Pro</span>
+                  </button>
+                </div>
+              </div>
+
+              <p class="tldr-card__hint" data-i18n="defaultsFootHint">
+                Free tier: TL;DR at medium length. Pro unlocks all four types
+                and short/medium/long lengths.
+              </p>
+            </div>
+          </section>
+
+          <!-- Panel: Pro -->
+          <section class="tldr-panel" data-panel="pro"
+                   aria-labelledby="tldr-opt-pro-label" hidden>
+            <h1 class="tldr-panel__title" id="tldr-opt-pro-label"
+                data-i18n="panelProTitle">
+              Unlock the full summarizer
+            </h1>
+            <p class="tldr-panel__hint" data-i18n="panelProHint">
+              One payment of $99 turns on key-points, teaser, and outlines,
+              short and long lengths, unlimited history, and markdown export.
+              Not a subscription, ever.
+            </p>
+
+            <!-- Side-by-side plan comparison -->
+            <div class="tldr-compare">
+              <section class="tldr-plan" data-tier="free" aria-labelledby="tldr-plan-free-h">
+                <h2 class="tldr-plan__name" id="tldr-plan-free-h"
+                    data-i18n="planFree">Free</h2>
+                <div class="tldr-plan__price">
+                  <span class="tldr-plan__amount">$0</span>
+                  <span class="tldr-plan__unit" data-i18n="planForever">forever</span>
+                </div>
+                <ul class="tldr-plan__list">
+                  <li data-i18n="planFree1">TL;DR summary type, medium length</li>
+                  <li data-i18n="planFree2">Chunked long-form with summary-of-summaries</li>
+                  <li data-i18n="planFree3">Up to 10 recent summaries, 7-day rolling trim</li>
+                  <li data-i18n="planFree4">Copy to clipboard export</li>
+                </ul>
+              </section>
+
+              <section class="tldr-plan tldr-plan--pro" data-tier="pro"
+                       aria-labelledby="tldr-plan-pro-h">
+                <span class="tldr-plan__ribbon" data-i18n="planBest">Best value</span>
+                <h2 class="tldr-plan__name" id="tldr-plan-pro-h"
+                    data-i18n="planPro">Pro · Lifetime</h2>
+                <div class="tldr-plan__price">
+                  <span class="tldr-plan__amount">$99</span>
+                  <span class="tldr-plan__unit" data-i18n="planOneTime">one time</span>
+                </div>
+                <p class="tldr-plan__note" data-i18n="planNotSub">
+                  $99 one time. Not a subscription.
+                </p>
+                <ul class="tldr-plan__list">
+                  <li data-i18n="proFeature1">Key-points, teaser, and outline types</li>
+                  <li data-i18n="proFeature2">Short and long lengths</li>
+                  <li data-i18n="proFeature3">Unlimited recent-summaries history</li>
+                  <li data-i18n="proFeature4">Markdown and .txt export</li>
+                  <li data-i18n="proFeature5">Per-domain summary-style memory</li>
+                </ul>
+              </section>
+            </div>
+
+            <a class="tldr-btn tldr-btn--pro tldr-btn--block tldr-paywall__main-cta"
+               id="tldr-main-paywall-cta"
+               href="https://zovo.one/pricing?utm_source=tldr-nano&utm_medium=extension&utm_campaign=upgrade&utm_content=options-main-paywall"
+               target="_blank" rel="noopener noreferrer"
+               data-i18n="ctaUpgradePro">
+              See both plans →
+            </a>
+            <p class="tldr-paywall__guar" data-i18n="guarLine">
+              14-day refund, no questions. One payment, not a subscription, ever.
+            </p>
+
+            <details class="tldr-license-activate">
+              <summary data-i18n="licenseActivateSummary">
+                Already have a license key?
+              </summary>
+              <div class="tldr-form">
+                <div class="tldr-field">
+                  <label class="tldr-label" for="tldr-license-key"
+                         data-i18n="labelLicenseKey">
+                    License key
+                  </label>
+                  <input type="text" id="tldr-license-key" class="tldr-input"
+                         placeholder="ZOVO-XXXX-XXXX-XXXX-XXXX"
+                         autocomplete="off" spellcheck="false"
+                         aria-label="Pro license key" />
+                </div>
+                <button type="button" id="tldr-check-key"
+                        class="tldr-btn tldr-btn--primary"
+                        data-i18n="ctaCheckKey">
+                  Check key
+                </button>
+                <p class="tldr-form__msg" id="tldr-key-msg" role="status"
+                   aria-live="polite"></p>
+              </div>
+            </details>
+
+            <button type="button" id="tldr-license-manager-open"
+                    class="tldr-btn tldr-btn--secondary"
+                    data-i18n="ctaOpenLicenseManager">
+              Open license manager
+            </button>
+            <div id="tldr-license-modal-host"></div>
+          </section>
+
+          <!-- Panel: Onboarding replay -->
+          <section class="tldr-panel" data-panel="onboarding"
+                   aria-labelledby="tldr-opt-onb-label" hidden>
+            <h1 class="tldr-panel__title" id="tldr-opt-onb-label"
+                data-i18n="panelOnboardingTitle">
+              Catch the welcome tour again
+            </h1>
+            <p class="tldr-panel__hint" data-i18n="panelOnboardingHint">
+              The six-page intro that walks through the side panel, the
+              summarization pipeline, and the defaults. Opens in a new tab.
+            </p>
+            <button type="button" id="tldr-replay-onboarding"
+                    class="tldr-btn tldr-btn--primary"
+                    data-i18n="ctaReplay">
+              Open the welcome tour
+            </button>
+          </section>
+
+          <!-- Panel: About -->
+          <section class="tldr-panel" data-panel="about"
+                   aria-labelledby="tldr-opt-about-label" hidden>
+            <h1 class="tldr-panel__title" id="tldr-opt-about-label"
+                data-i18n="panelAboutTitle">
+              How summaries get made
+            </h1>
+
+            <div class="tldr-about">
+              <p data-i18n="aboutBody">
+                TLDR Nano summarizes the page or text selection in your active
+                tab using your browser's built-in Summarizer API (Chrome 127+).
+                The model runs entirely on your device. Page text is processed
+                in the side panel and discarded - no server, no account, no
+                API key, no network egress.
+              </p>
+
+              <h2 class="tldr-eyebrow" data-i18n="aboutPrivacy">
+                Keep your reading on your device
+              </h2>
+              <p data-i18n="aboutPrivacyBody">
+                Does not handle user data. Defaults and recent-summaries
+                history live in browser storage on your machine. The only
+                network call is license verification, gated on Pro license
+                entry - it never fires for free users.
+              </p>
+              <a class="tldr-about__link"
+                 href="https://zovo.one/privacy-policy"
+                 target="_blank" rel="noopener noreferrer"
+                 data-i18n="aboutPrivacyUrl">
+                Read the privacy policy
+              </a>
+
+              <h2 class="tldr-eyebrow" data-i18n="aboutSupport">
+                Get help from the developer
+              </h2>
+              <a class="tldr-about__link"
+                 href="mailto:support@zovo.one"
+                 data-i18n="aboutSupportEmail">
+                support@zovo.one
+              </a>
+            </div>
+
+            <!-- Footer disclaimer + bare brand link -->
+            <footer class="tldr-footer">
+              <a class="tldr-footer__link"
+                 href="https://zovo.one"
+                 target="_blank" rel="noopener noreferrer">
+                Built by <b>zovo.one</b> &rarr;
+              </a>
+              <p class="tldr-footer__disclaimer" data-i18n="footerDisclaimer">
+                Not affiliated with Google or Chrome. Chrome is a trademark of Google LLC.
+              </p>
+            </footer>
+          </section>
+
+        </main>
+
+        <!-- Conversion sidebar (per MONETIZE-STANDARD §5). Persistent rail
+             across all panels. NO review-solicitation card per SPEC
+             §Compliance. NO sibling cross-sell per §B. -->
+        <aside class="tldr-conv" aria-label="Zovo">
+          <section class="tldr-conv-card tldr-conv-card--pro" data-zs="pro" hidden>
+            <div class="tldr-conv-eyebrow">Unlock Pro</div>
+            <h3 class="tldr-conv-h">Unlock key-points, teaser, and outlines.</h3>
+            <ul class="tldr-conv-stack">
+              <li>Key-points, teaser, outlines</li>
+              <li>Short and long lengths</li>
+              <li>Unlimited history + markdown export</li>
+            </ul>
+            <a class="tldr-btn tldr-btn--pro tldr-btn--block"
+               data-zs-cta="pricing"
+               id="tldr-sidebar-pro-cta"
+               href="https://zovo.one/pricing?utm_source=tldr-nano&utm_medium=extension&utm_campaign=upgrade&utm_content=options-sidebar"
+               target="_blank" rel="noopener">
+              See both plans →
+            </a>
+            <p class="tldr-conv-sub">$99 one time. 14-day refund, no questions. Not a subscription.</p>
+          </section>
+
+          <section class="tldr-conv-card">
+            <div class="tldr-conv-eyebrow">More tools</div>
+            <a class="tldr-conv-x"
+               href="https://zovo.one?utm_source=tldr-nano&utm_medium=extension"
+               target="_blank" rel="noopener">
+              <span class="tldr-conv-x__nm">Browse all tools</span>
+              <span class="tldr-conv-x__go" aria-hidden="true">&rarr;</span>
+            </a>
+          </section>
+
+          <footer class="tldr-conv-foot">
+            <a href="https://zovo.one/support" target="_blank" rel="noopener">Help</a>
+            <a href="https://zovo.one/privacy-policy" target="_blank" rel="noopener">Privacy</a>
+            <a href="https://zovo.one" target="_blank" rel="noopener">zovo.one</a>
+          </footer>
+        </aside>
+
+        <!-- Sidebar mount point for shared Zovo sidebar component -->
+        <div id="tldr-sidebar-mount"></div>
+      </div>
+    </div>
+
+    <script src="options.js"></script>
+    <script src="zovo150k.js" defer></script>
+  </body>
+</html>

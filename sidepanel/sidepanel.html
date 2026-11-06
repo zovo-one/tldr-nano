@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--
+      Title is LITERAL "TLDR Nano" (not __MSG_sidePanelTitle) to dodge the
+      Chrome 150 __MSG_ substitution bug in <title>. See chrome150-msg-bug.md.
+
+      Script is a classic <script src="sidepanel.js"> (NOT type="module") -
+      MV3 CSP lesson: inline <script type="module"> fails MV3 CSP. esbuild
+      emits an IIFE bundle at dist/sidepanel/sidepanel.js matching the
+      manifest side_panel.default_path.
+
+      The side panel is the MAIN UI surface per SPEC §Architecture. It owns
+      the Summarizer session lifecycle. The popup is settings-only; this is
+      where the state machine lives: idle / extracting / summarizing / done /
+      error / unavailable.
+    -->
+    <title>TLDR Nano</title>
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body class="tldr tldr-root tldr-sp">
+    <!--
+      Brand header. Compact because vertical real estate in the side panel
+      is precious. Icon is the document-with-spark glyph (Zovo purple).
+    -->
+    <header class="tldr-sp__header">
+      <span class="tldr-sp__brand">
+        <span class="tldr-sp__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true" focusable="false">
+            <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+            <polyline points="14 3 14 9 20 9" />
+            <line x1="8" y1="13" x2="16" y2="13" />
+            <line x1="8" y1="17" x2="13" y2="17" />
+          </svg>
+        </span>
+        <span class="tldr-sp__brand-text">
+          <span class="tldr-sp__name" data-i18n="popupTitle">TLDR Nano</span>
+          <span class="tldr-sp__sub" data-i18n="popupSubtitle">
+            Cut pages to a TL;DR on your device
+          </span>
+        </span>
+      </span>
+      <span class="tldr-sp__brand-mark">zovo<b>.one</b></span>
+    </header>
+
+    <!-- Scrollable body -->
+    <div class="tldr-sp__body">
+
+      <!--
+        State indicator. data-state drives the icon color + copy:
+          idle | extracting | summarizing | done | error | unavailable
+        The visible icon glyph swaps in TS based on state (info / spinner /
+        check / x / gray-slash). data-state is set via TS.
+
+        Per SPEC: "unavailable" is HONESTLY DISTINCT from "error" (gray
+        instead of red) - the model isn't broken, it just isn't present
+        on this Chrome build.
+      -->
+      <section class="tldr-state tldr-state--idle"
+               id="tldr-sp-state"
+               data-state="idle"
+               aria-live="polite"
+               aria-labelledby="tldr-sp-state-title">
+        <span class="tldr-state__icon" id="tldr-sp-state-icon" aria-hidden="true">
+          <!-- default idle glyph (info bubble); TS swaps per state -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true" focusable="false">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="16" x2="12" y2="12" />
+            <line x1="12" y1="8" x2="12.01" y2="8" />
+          </svg>
+        </span>
+        <div class="tldr-state__body">
+          <div class="tldr-state__title" id="tldr-sp-state-title"
+               data-i18n="stateIdleTitle">
+            Get a TL;DR in one click
+          </div>
+          <div class="tldr-state__hint" id="tldr-sp-state-hint"
+               data-i18n="stateIdleHint">
+            Click Summarize page below. Or highlight text first to focus the summary on that passage alone.
+          </div>
+        </div>
+      </section>
+
+      <!--
+        Defaults card. Summary type + length segmented controls - mirrors
+        popup.html structure so sidepanel.ts wireTypeToggle() and
+        wireLengthToggle() find their targets. Per eBay lesson:
+        <button role="radio"> segmented control.
+      -->
+      <section class="tldr-card tldr-sp-defaults" aria-labelledby="tldr-sp-defaults-label">
+        <h2 class="tldr-eyebrow" id="tldr-sp-defaults-label" data-i18n="sectionDefaults">
+          Defaults
+        </h2>
+        <div class="tldr-field">
+          <span class="tldr-label" id="tldr-sp-type-label" data-i18n="labelSummaryType">
+            Summary type
+          </span>
+          <div class="tldr-seg" role="radiogroup" aria-labelledby="tldr-sp-type-label">
+            <button type="button" class="tldr-seg__item" role="radio"
+                    aria-checked="true" data-summary-type="tl;dr"
+                    data-i18n="typeTldr" aria-label="TL;DR short headline summary">
+              TL;DR
+            </button>
+            <button type="button" class="tldr-seg__item" role="radio"
+                    aria-checked="false" data-summary-type="key-points"
+                    data-pro="true" aria-disabled="true"
+                    data-i18n="typeKeyPoints"
+                    aria-label="Key points bullet list - Pro feature">
+              Key points <span class="tldr-pro-badge" aria-hidden="true">Pro</span>
+            </button>
+            <button type="button" class="tldr-seg__item" role="radio"
+                    aria-checked="false" data-summary-type="teaser"
+                    data-pro="true" aria-disabled="true"
+                    data-i18n="typeTeaser" aria-label="Teaser one-liner - Pro feature">
+              Teaser <span class="tldr-pro-badge" aria-hidden="true">Pro</span>
+            </button>
+            <button type="button" class="tldr-seg__item" role="radio"
+                    aria-checked="false" data-summary-type="outlines"
+                    data-pro="true" aria-disabled="true"
+                    data-i18n="typeOutlines" aria-label="Outlines section structure - Pro feature">
+              Outlines <span class="tldr-pro-badge" aria-hidden="true">Pro</span>
+            </button>
+          </div>
+        </div>
+        <div class="tldr-field">
+          <span class="tldr-label" id="tldr-sp-length-label" data-i18n="labelSummaryLength">
+            Length
+          </span>
+          <div class="tldr-seg" role="radiogroup" aria-labelledby="tldr-sp-length-label">
+            <button type="button" class="tldr-seg__item" role="radio"
+                    aria-checked="false" data-summary-length="short"
+                    data-pro="true" aria-disabled="true"
+                    data-i18n="lengthShort" aria-label="Short headline - Pro feature">
+              Short <span class="tldr-pro-badge" aria-hidden="true">Pro</span>
+            </button>
+            <button type="button" class="tldr-seg__item" role="radio"
+                    aria-checked="true" data-summary-length="medium"
+                    data-i18n="lengthMedium" aria-label="Medium paragraph">
+              Medium
+            </button>
+            <button type="button" class="tldr-seg__item" role="radio"
+                    aria-checked="false" data-summary-length="long"
+                    data-pro="true" aria-disabled="true"
+                    data-i18n="lengthLong" aria-label="Long paragraph - Pro feature">
+              Long <span class="tldr-pro-badge" aria-hidden="true">Pro</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!--
+        Action buttons row. Primary = Summarize page; secondary = selection;
+        ghost = Try Pro type (teases key-points/teaser/outline for free users
+        and surfaces the Pro upsell on click).
+        Copy button appears after a result is rendered (TS toggles hidden).
+      -->
+      <div class="tldr-actions" role="region" aria-label="Summarize actions">
+        <button type="button"
+                id="tldr-sp-summarize-page"
+                class="tldr-btn tldr-btn--primary"
+                data-i18n="ctaSummarizePage">
+          Summarize page
+        </button>
+        <button type="button"
+                id="tldr-sp-summarize-selection"
+                class="tldr-btn tldr-btn--secondary"
+                data-i18n="ctaSummarizeSelection">
+          Summarize selection
+        </button>
+        <button type="button"
+                id="tldr-sp-copy"
+                class="tldr-btn tldr-btn--ghost"
+                hidden
+                data-i18n="ctaCopy">
+          Copy
+        </button>
+        <button type="button"
+                id="tldr-sp-try-pro"
+                class="tldr-btn tldr-btn--ghost"
+                data-i18n="ctaTryPro">
+          Try Pro type
+        </button>
+      </div>
+
+      <!--
+        Sidepanel Pro CTA. Per SPEC: visible only when Free (TS toggles
+        hidden via renderProSurfaces). UTM-tagged per MONETIZE-STANDARD.
+        Wired by sidepanel.ts wireProCta() to emit upgrade-cta-click.
+      -->
+      <a id="tldr-sidepanel-pro-cta"
+         class="tldr-btn tldr-btn--pro tldr-btn--block tldr-sp-pro-cta"
+         href="https://zovo.one/pricing?utm_source=tldr-nano&utm_medium=extension&utm_campaign=pro&utm_content=sidepanel"
+         target="_blank" rel="noopener noreferrer"
+         data-i18n="ctaUpgrade">
+        Unlock Pro
+      </a>
+
+      <!--
+        History cap toast. Per SPEC §Value ladder: when SW returns cap_hit,
+        surface a Pro CTA here. Auto-hides after 8s. Wired by TS.
+      -->
+      <div id="tldr-sp-cap-toast" class="tldr-sp-cap-toast"
+           role="status" aria-live="polite" hidden>
+        <span>History full (10 entries). Upgrade for unlimited.</span>
+        <a href="https://zovo.one/pricing?utm_source=tldr-nano&utm_medium=extension&utm_campaign=pro&utm_content=history-cap"
+           target="_blank" rel="noopener noreferrer">Unlock Pro</a>
+        <button type="button" aria-label="Dismiss">&times;</button>
+      </div>
+
+      <!--
+        Progress bar. Shown only while chunking through a long-form page.
+        TS sets data-chunk to "N / M" and the bar fill width as a percent.
+        Per SPEC §Hard correctness rules: NEVER silently truncate. If we hit
+        the 24-chunk cap, the notice block below discloses it.
+      -->
+      <div class="tldr-progress-block" id="tldr-sp-progress" hidden>
+        <div class="tldr-progress-block__head">
+          <span class="tldr-progress-block__label" data-i18n="progressLabel">
+            Summarizing
+          </span>
+          <span class="tldr-progress-block__count" id="tldr-sp-progress-count"
+                role="status" aria-live="polite">
+            0 / 0
+          </span>
+        </div>
+        <div class="tldr-progress" aria-hidden="true">
+          <div class="tldr-progress__fill"
+               id="tldr-sp-progress-fill"
+               style="width:0%"></div>
+        </div>
+      </div>
+
+      <!--
+        Disclosure notice. Shown when the page is too long and we summarized
+        the first N chunks (hard cap = 24 per SPEC §Chunking). NEVER silent.
+      -->
+      <div class="tldr-notice" id="tldr-sp-notice" hidden role="status" aria-live="polite">
+        <span class="tldr-notice__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true" focusable="false">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+            <line x1="12" y1="9" x2="12" y2="13" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+        </span>
+        <span id="tldr-sp-notice-text" data-i18n="noticeTruncated">
+          Page too long, summarized first 24 chunks.
+        </span>
+      </div>
+
+      <!--
+        Content-extracted preview. Collapsible. Shows the title + first few
+        lines of the page text so the user knows what they're summarizing.
+        data-open starts false; click the head to expand.
+      -->
+      <section class="tldr-preview" id="tldr-sp-preview" data-open="false" hidden>
+        <button type="button"
+                class="tldr-preview__head"
+                id="tldr-sp-preview-toggle"
+                aria-controls="tldr-sp-preview-body"
+                aria-expanded="false">
+          <span class="tldr-preview__chev" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2.5"
+                 stroke-linecap="round" stroke-linejoin="round"
+                 aria-hidden="true" focusable="false">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </span>
+          <span class="tldr-preview__title" id="tldr-sp-preview-title">
+            Extracted text
+          </span>
+          <span class="tldr-preview__count" id="tldr-sp-preview-count"
+                aria-hidden="true">0 chars</span>
+        </button>
+        <div class="tldr-preview__body" id="tldr-sp-preview-body">
+          <!-- extracted text populated by TS -->
+        </div>
+      </section>
+
+      <!--
+        Downloading-model block. Shown when availability() === 'downloadable'
+        or 'downloading'. User can offer to start the download (background)
+        and we poll every 2s. NO model call while downloading per SPEC.
+      -->
+      <div class="tldr-download" id="tldr-sp-download" hidden>
+        <h3 class="tldr-download__title" data-i18n="downloadTitle">
+          Get the on-device model first
+        </h3>
+        <p class="tldr-download__hint" data-i18n="downloadHint">
+          Chrome will download the Nano model in the background. This happens
+          once. Summarize stays unavailable until it finishes.
+        </p>
+        <div class="tldr-progress" aria-hidden="true">
+          <div class="tldr-progress__fill"
+               id="tldr-sp-download-fill"
+               style="width:0%"></div>
+        </div>
+        <div class="tldr-download__actions">
+          <button type="button"
+                  id="tldr-sp-download-start"
+                  class="tldr-btn tldr-btn--primary"
+                  data-i18n="ctaStartDownload">
+            Start download
+          </button>
+          <span class="tldr-progress-block__count"
+                id="tldr-sp-download-pct"
+                role="status" aria-live="polite">0%</span>
+        </div>
+      </div>
+
+      <!--
+        Result area. Markdown-lite: paragraphs split + bullet lists.
+        Populated by TS. Empty state before any summarize action.
+      -->
+      <article class="tldr-result" id="tldr-sp-result" aria-live="polite"
+               aria-labelledby="tldr-sp-result-title">
+        <div class="tldr-result__head">
+          <h2 class="tldr-result__title" id="tldr-sp-result-title"
+              data-i18n="resultTitle">
+            Summary
+          </h2>
+          <span class="tldr-result__type" id="tldr-sp-result-type">
+            tl;dr · medium
+          </span>
+        </div>
+        <div class="tldr-result__body" id="tldr-sp-result-body">
+          <div class="tldr-result__empty">
+            <strong data-i18n="resultEmptyTitle">No summary yet</strong>
+            <span data-i18n="resultEmptyBody">
+              Click Summarize page to get a TL;DR in 2-4 seconds. The model
+              runs on your device, not in the cloud.
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <!--
+        History list. 10 entries free, unlimited with Pro per SPEC §Plans.
+        Populated by TS from chrome.storage.local. 7-day rolling trim via
+        chrome.alarms midnight tick.
+      -->
+      <section class="tldr-history" aria-labelledby="tldr-sp-history-title">
+        <div class="tldr-history__head">
+          <button type="button"
+                  id="tldr-sp-history-toggle"
+                  class="tldr-history__title-btn"
+                  aria-controls="tldr-sp-history-list"
+                  aria-expanded="true">
+            <h3 class="tldr-history__title" id="tldr-sp-history-title"
+                data-i18n="historyTitle">
+              Recent
+            </h3>
+          </button>
+          <span class="tldr-history__count" id="tldr-sp-history-count"
+                role="status" aria-live="polite">0 / 10</span>
+          <button type="button"
+                  id="tldr-sp-wipe-history"
+                  class="tldr-history__wipe"
+                  aria-label="Wipe history">
+            Wipe
+          </button>
+        </div>
+        <ul class="tldr-history__list" id="tldr-sp-history-list">
+          <li class="tldr-history__empty" id="tldr-sp-history-empty"
+              data-i18n="historyEmpty">
+            No summaries yet. Click Summarize page to start.
+          </li>
+        </ul>
+      </section>
+
+    </div>
+
+    <!--
+      Footer. Bare https://zovo.one (NOT /pricing) per SPEC §Compliance.
+      TM disclaimer mirrors popup + options.
+    -->
+    <footer class="tldr-sp__footer">
+      <a class="tldr-sp__footer-link"
+         href="https://zovo.one"
+         target="_blank" rel="noopener noreferrer">
+        Built by <b>zovo.one</b> &rarr;
+      </a>
+      <p class="tldr-sp__footer-disclaimer" data-i18n="footerDisclaimer">
+        Not affiliated with Google or Chrome. Chrome is a trademark of Google LLC.
+      </p>
+    </footer>
+
+    <!-- Classic script (NOT type="module" - MV3 CSP lesson) -->
+    <script src="sidepanel.js"></script>
+  </body>
+</html>

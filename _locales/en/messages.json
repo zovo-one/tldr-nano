@@ -1,0 +1,375 @@
+{
+  "extName": {
+    "message": "TLDR Nano",
+    "description": "Extension product name shown in manifest name field and store listing title."
+  },
+  "extDesc": {
+    "message": "Cut any article to a 3-sentence TL;DR in 2-4 seconds, on-device in a side panel. No cloud, no API key, nothing leaves your browser.",
+    "description": "Store listing description (CWS extDesc, max 132 chars). Honest, no fabricated stats, no review solicitation. Used by manifest description field."
+  },
+
+  "popupTitle": {
+    "message": "TLDR Nano",
+    "description": "Header brand name shown at the top of popup, options, and side panel."
+  },
+  "popupSubtitle": {
+    "message": "Cut pages to a TL;DR on your device",
+    "description": "Tagline under the brand name. Benefit verb (cut) per sales copy."
+  },
+  "optionsTitle": {
+    "message": "TLDR Nano - Settings",
+    "description": "Browser tab title for the options page. Plain hyphen, no em dash per scan.py."
+  },
+  "optionsEyebrow": {
+    "message": "Settings",
+    "description": "Page eyebrow label on the options page."
+  },
+  "onboardingTitle": {
+    "message": "Get your first TL;DR in 30 seconds",
+    "description": "Browser tab title for the onboarding page. Benefit-led."
+  },
+
+  "sectionQuickStart": {
+    "message": "Summarize this page"
+  },
+  "heroHint": {
+    "message": "Open the side panel, click Summarize, and get a TL;DR in 2-4 seconds. The model runs on your device - nothing leaves your browser."
+  },
+  "ctaOpenSidePanel": {
+    "message": "Open side panel"
+  },
+
+  "sectionDefaults": {
+    "message": "Defaults"
+  },
+  "defaultsHint": {
+    "message": "These apply every time you click Summarize in the side panel."
+  },
+  "panelDefaultsTitle": {
+    "message": "Get the right summary every time"
+  },
+  "panelDefaultsHint": {
+    "message": "These apply every time you click Summarize in the side panel. Switch the type and length here once and skip the popup."
+  },
+  "labelSummaryType": {
+    "message": "Summary type"
+  },
+  "labelSummaryLength": {
+    "message": "Length"
+  },
+  "typeTldr": {
+    "message": "TL;DR"
+  },
+  "typeKeyPoints": {
+    "message": "Key points"
+  },
+  "typeTeaser": {
+    "message": "Teaser"
+  },
+  "typeOutlines": {
+    "message": "Outlines"
+  },
+  "lengthShort": {
+    "message": "Short"
+  },
+  "lengthMedium": {
+    "message": "Medium"
+  },
+  "lengthLong": {
+    "message": "Long"
+  },
+  "defaultsFootHint": {
+    "message": "Free tier: TL;DR at medium length. Pro unlocks all four types and short/medium/long lengths."
+  },
+
+  "sectionRecent": {
+    "message": "Recent"
+  },
+  "recentCount": {
+    "message": "0/10"
+  },
+  "recentEmpty": {
+    "message": "No summaries yet. Open the side panel to start."
+  },
+  "historyTitle": {
+    "message": "Recent"
+  },
+  "historyEmpty": {
+    "message": "No summaries yet. Click Summarize page to start."
+  },
+
+  "sectionPro": {
+    "message": "Unlock Pro"
+  },
+  "proHint": {
+    "message": "All four summary types, short/medium/long lengths, unlimited history, and clipboard / markdown / .txt export. One payment, not a subscription."
+  },
+  "proFeature1": {
+    "message": "Key-points, teaser, and outline types"
+  },
+  "proFeature2": {
+    "message": "Short and long lengths"
+  },
+  "proFeature3": {
+    "message": "Unlimited recent-summaries history"
+  },
+  "proFeature4": {
+    "message": "Markdown and .txt export"
+  },
+  "proFeature5": {
+    "message": "Per-domain summary-style memory"
+  },
+
+  "ctaUpgrade": {
+    "message": "See both plans at zovo.one"
+  },
+  "ctaUpgradePro": {
+    "message": "Get Pro - $$99 lifetime"
+  },
+  "proActive": {
+    "message": "Pro active - thank you"
+  },
+  "proCtaPopup": {
+    "message": "Get Pro - $$99 lifetime"
+  },
+  "proCtaSidebar": {
+    "message": "Get Pro - $$99 lifetime"
+  },
+  "guarLine": {
+    "message": "14-day refund, no questions. One payment, not a subscription, ever."
+  },
+
+  "panelProTitle": {
+    "message": "Unlock the full summarizer"
+  },
+  "panelProHint": {
+    "message": "One payment of $$99 turns on key-points, teaser, and outlines, short and long lengths, unlimited history, and markdown export. Not a subscription, ever."
+  },
+  "planFree": {
+    "message": "Free"
+  },
+  "planPro": {
+    "message": "Pro \u00b7 Lifetime"
+  },
+  "planForever": {
+    "message": "forever"
+  },
+  "planOneTime": {
+    "message": "one time"
+  },
+  "planNotSub": {
+    "message": "$$99 one time. Not a subscription."
+  },
+  "planBest": {
+    "message": "Best value"
+  },
+  "planFree1": {
+    "message": "TL;DR summary type, medium length"
+  },
+  "planFree2": {
+    "message": "Chunked long-form with summary-of-summaries"
+  },
+  "planFree3": {
+    "message": "Up to 10 recent summaries, 7-day rolling trim"
+  },
+  "planFree4": {
+    "message": "Copy to clipboard export"
+  },
+
+  "navDefaults": {
+    "message": "Defaults"
+  },
+  "navPro": {
+    "message": "Unlock Pro"
+  },
+  "navOnboarding": {
+    "message": "Welcome tour"
+  },
+  "navAbout": {
+    "message": "About this tool"
+  },
+
+  "licenseActivateSummary": {
+    "message": "Already have a license key?"
+  },
+  "labelLicenseKey": {
+    "message": "License key"
+  },
+  "ctaCheckKey": {
+    "message": "Check key"
+  },
+  "ctaOpenLicenseManager": {
+    "message": "Open license manager"
+  },
+  "licenseTitle": {
+    "message": "Activate Pro"
+  },
+  "licensePrompt": {
+    "message": "Paste your Zovo license key to unlock Pro."
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "verify": {
+    "message": "Verify"
+  },
+  "licenseHelp": {
+    "message": "Lost your key? Email support@zovo.one."
+  },
+  "licenseEmpty": {
+    "message": "Enter a key first."
+  },
+  "licenseVerifying": {
+    "message": "Verifying..."
+  },
+  "licenseSuccess": {
+    "message": "Pro active. Thank you!"
+  },
+  "licenseInvalid": {
+    "message": "Invalid key."
+  },
+  "licenseError": {
+    "message": "Could not reach service worker."
+  },
+
+  "panelOnboardingTitle": {
+    "message": "Catch the welcome tour again"
+  },
+  "panelOnboardingHint": {
+    "message": "The six-page intro that walks through the side panel, the summarization pipeline, and the defaults. Opens in a new tab."
+  },
+  "ctaReplay": {
+    "message": "Open the welcome tour"
+  },
+
+  "panelAboutTitle": {
+    "message": "How summaries get made"
+  },
+  "aboutBody": {
+    "message": "TLDR Nano summarizes the page or text selection in your active tab using your browser's built-in Summarizer API (Chrome 127+). The model runs entirely on your device. Page text is processed in the side panel and discarded - no server, no account, no API key, no network egress."
+  },
+  "aboutPrivacy": {
+    "message": "Keep your reading on your device"
+  },
+  "aboutPrivacyBody": {
+    "message": "Does not handle user data. Defaults and recent-summaries history live in browser storage on your machine. The only network call is license verification, gated on Pro license entry - it never fires for free users."
+  },
+  "aboutPrivacyUrl": {
+    "message": "Read the privacy policy"
+  },
+  "aboutSupport": {
+    "message": "Get help from the developer"
+  },
+  "aboutSupportEmail": {
+    "message": "support@zovo.one"
+  },
+
+  "footerDisclaimer": {
+    "message": "Not affiliated with Google or Chrome. Chrome is a trademark of Google LLC.",
+    "description": "TM disclaimer required per SPEC. Must appear verbatim on every surface footer."
+  },
+  "footerSupport": {
+    "message": "support@zovo.one"
+  },
+
+  "stateIdleTitle": {
+    "message": "Get a TL;DR in one click"
+  },
+  "stateIdleHint": {
+    "message": "Click Summarize page below. Or highlight text first to focus the summary on that passage alone."
+  },
+  "ctaSummarizePage": {
+    "message": "Summarize page"
+  },
+  "ctaSummarizeSelection": {
+    "message": "Summarize selection"
+  },
+  "ctaCopy": {
+    "message": "Copy"
+  },
+  "ctaTryPro": {
+    "message": "Try Pro type"
+  },
+  "progressLabel": {
+    "message": "Summarizing"
+  },
+  "noticeTruncated": {
+    "message": "Page too long, summarized first 24 chunks."
+  },
+  "truncatedNotice": {
+    "message": "Long page: summarized the first $1 chunks. Try selecting a section for tighter focus.",
+    "description": "Positional placeholder per tree-tabs fleet lesson. $1 is the chunk count."
+  },
+  "downloadTitle": {
+    "message": "Get the on-device model first"
+  },
+  "downloadHint": {
+    "message": "Chrome will download the Nano model in the background. This happens once. Summarize stays unavailable until it finishes."
+  },
+  "ctaStartDownload": {
+    "message": "Start download"
+  },
+  "resultTitle": {
+    "message": "Summary"
+  },
+  "resultEmptyTitle": {
+    "message": "No summary yet"
+  },
+  "resultEmptyBody": {
+    "message": "Click Summarize page to get a TL;DR in 2-4 seconds. The model runs on your device, not in the cloud."
+  },
+  "copied": {
+    "message": "Copied"
+  },
+  "exportLocked": {
+    "message": "Pro feature"
+  },
+  "extractionEmpty": {
+    "message": "Couldn't find readable text on this page. Try selecting the text you want summarized."
+  },
+  "modelUnavailable": {
+    "message": "This Chrome build doesn't include the on-device model. Try desktop Chrome 127+."
+  },
+  "modelNeedsDownload": {
+    "message": "The on-device model needs to download first. Click Start download."
+  },
+  "summarizePage": {
+    "message": "Summarize this page"
+  },
+  "summarizeBusy": {
+    "message": "Working..."
+  },
+  "phaseChunking": {
+    "message": "Chunk"
+  },
+  "phaseCombining": {
+    "message": "Combining partial summaries..."
+  },
+  "statusIdle": {
+    "message": "Ready"
+  },
+  "statusExtracting": {
+    "message": "Reading page..."
+  },
+  "statusChecking": {
+    "message": "Checking model..."
+  },
+  "statusStarting": {
+    "message": "Starting model..."
+  },
+  "statusSummarizing": {
+    "message": "Summarizing..."
+  },
+  "statusChunking": {
+    "message": "Splitting long text..."
+  },
+  "statusDone": {
+    "message": "Done"
+  },
+  "statusError": {
+    "message": "Error"
+  },
+  "statusUnavailable": {
+    "message": "Model unavailable"
+  }
+}

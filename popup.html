@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--
+      Title is LITERAL "TLDR Nano" (not __MSG_popupTitle) to dodge the Chrome
+      150 __MSG_ substitution bug in <title> for extension documents.
+      See fleet memory chrome150-msg-bug.md. The visible header text comes
+      from data-i18n="popupTitle" populated by TS.
+
+      Script is a classic <script src="popup.js"> (NOT type="module") per the
+      MV3 CSP lesson: inline <script type="module"> fails MV3 CSP. esbuild
+      emits an IIFE bundle at dist/popup.js.
+    -->
+    <title>TLDR Nano</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body class="tldr tldr-root tldr-popup">
+    <!--
+      Brand header. Icon is a stylized document-with-spark mark (Zovo purple)
+      - original work, NOT a Chrome wordmark or any Google-branded glyph.
+      SPEC §Compliance: NO "Chrome" in product name.
+    -->
+    <header class="tldr-header">
+      <span class="tldr-header__icon" aria-hidden="true">
+        <!-- Document + spark (summarization motif, original work) -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true" focusable="false">
+          <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+          <polyline points="14 3 14 9 20 9" />
+          <line x1="8" y1="13" x2="16" y2="13" />
+          <line x1="8" y1="17" x2="13" y2="17" />
+        </svg>
+      </span>
+      <span class="tldr-header__title">
+        <span class="tldr-header__name" data-i18n="popupTitle">TLDR Nano</span>
+        <span class="tldr-header__sub" data-i18n="popupSubtitle">
+          Cut pages to a TL;DR on your device
+        </span>
+      </span>
+      <span class="tldr-header__brand">zovo<b>.one</b></span>
+    </header>
+
+    <!--
+      Open-side-panel hero action. This is the primary CTA in the popup:
+      one click opens the side panel where the real summarization UI lives.
+      Per SPEC §Architecture: the popup is settings-only; the side panel
+      owns the Summarizer session lifecycle.
+    -->
+    <section class="tldr-card tldr-card--hero" aria-labelledby="tldr-pop-hero-label">
+      <h2 class="tldr-eyebrow" id="tldr-pop-hero-label" data-i18n="sectionQuickStart">
+        Summarize this page
+      </h2>
+      <p class="tldr-card__hint" data-i18n="heroHint">
+        Open the side panel, click Summarize, and get a TL;DR in 2-4 seconds.
+        The model runs on your device - nothing leaves your browser.
+      </p>
+      <button type="button"
+              id="tldr-open-side-panel"
+              class="tldr-btn tldr-btn--primary tldr-btn--block tldr-open-side-panel"
+              data-i18n="ctaOpenSidePanel">
+        Open side panel
+      </button>
+    </section>
+
+    <!--
+      Defaults card. Summary type + length segmented controls.
+      Per eBay lesson: <button role="radio"> segmented control, NOT a <select>.
+      TS wires via querySelectorAll('[data-summary-type]') etc.
+      data-prefs-key on each field tells storage.ts which key to persist under.
+    -->
+    <section class="tldr-card" aria-labelledby="tldr-pop-defaults-label">
+      <h2 class="tldr-eyebrow" id="tldr-pop-defaults-label" data-i18n="sectionDefaults">
+        Defaults
+      </h2>
+      <p class="tldr-card__hint" data-i18n="defaultsHint">
+        These apply every time you click Summarize in the side panel.
+      </p>
+
+      <div class="tldr-field">
+        <span class="tldr-label" id="tldr-pop-type-label" data-i18n="labelSummaryType">
+          Summary type
+        </span>
+        <div class="tldr-seg" role="radiogroup" aria-labelledby="tldr-pop-type-label">
+          <button type="button" class="tldr-seg__item" role="radio"
+                  aria-checked="true" data-summary-type="tl;dr"
+                  data-i18n="typeTldr" aria-label="TL;DR short headline summary">
+            TL;DR
+          </button>
+          <button type="button" class="tldr-seg__item" role="radio"
+                  aria-checked="false" data-summary-type="key-points"
+                  data-pro="true" aria-disabled="true"
+                  data-i18n="typeKeyPoints"
+                  aria-label="Key points bullet list - Pro feature">
+            Key points <span class="tldr-pro-badge" aria-hidden="true">Pro</span>
+          </button>
+          <button type="button" class="tldr-seg__item" role="radio"
+                  aria-checked="false" data-summary-type="teaser"
+                  data-pro="true" aria-disabled="true"
+                  data-i18n="typeTeaser" aria-label="Teaser one-liner - Pro feature">
+            Teaser <span class="tldr-pro-badge" aria-hidden="true">Pro</span>
+          </button>
+          <button type="button" class="tldr-seg__item" role="radio"
+                  aria-checked="false" data-summary-type="outlines"
+                  data-pro="true" aria-disabled="true"
+                  data-i18n="typeOutlines" aria-label="Outlines section structure - Pro feature">
+            Outlines <span class="tldr-pro-badge" aria-hidden="true">Pro</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="tldr-field">
+        <span class="tldr-label" id="tldr-pop-length-label" data-i18n="labelSummaryLength">
+          Length
+        </span>
+        <div class="tldr-seg" role="radiogroup" aria-labelledby="tldr-pop-length-label">
+          <button type="button" class="tldr-seg__item" role="radio"
+                  aria-checked="false" data-summary-length="short"
+                  data-pro="true" aria-disabled="true"
+                  data-i18n="lengthShort" aria-label="Short headline - Pro feature">
+            Short <span class="tldr-pro-badge" aria-hidden="true">Pro</span>
+          </button>
+          <button type="button" class="tldr-seg__item" role="radio"
+                  aria-checked="true" data-summary-length="medium"
+                  data-i18n="lengthMedium" aria-label="Medium paragraph">
+            Medium
+          </button>
+          <button type="button" class="tldr-seg__item" role="radio"
+                  aria-checked="false" data-summary-length="long"
+                  data-pro="true" aria-disabled="true"
+                  data-i18n="lengthLong" aria-label="Long paragraph - Pro feature">
+            Long <span class="tldr-pro-badge" aria-hidden="true">Pro</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!--
+      Recent summaries quick list. 10-entry free / unlimited Pro per SPEC.
+      Items are populated by TS from chrome.storage.local history.
+      Empty state is honest, no fabricated stats.
+    -->
+    <section class="tldr-card tldr-card--flush" aria-labelledby="tldr-pop-recent-label">
+      <div class="tldr-pro-head">
+        <h2 class="tldr-eyebrow" id="tldr-pop-recent-label" data-i18n="sectionRecent">
+          Recent
+        </h2>
+        <span class="tldr-pro-price" id="tldr-recent-count" role="status"
+              aria-live="polite" data-i18n="recentCount">0/10</span>
+      </div>
+      <ul class="tldr-recent" id="tldr-recent-list">
+        <li class="tldr-recent__empty" id="tldr-recent-empty" data-i18n="recentEmpty">
+          No summaries yet. Open the side panel to start.
+        </li>
+      </ul>
+    </section>
+
+    <!--
+      Pro upsell - single amber CTA per DESIGN-SYSTEM §3. URL goes to
+      /pricing with utm_* per MONETIZE-STANDARD. Per SPEC §Compliance:
+      the popup Pro CTA is the explicit commerce path; footer stays BARE
+      https://zovo.one (doubling trips B-crosssell).
+    -->
+    <section class="tldr-card tldr-card--flush" aria-labelledby="tldr-pop-pro-label">
+      <div class="tldr-pro-head">
+        <h2 class="tldr-eyebrow" id="tldr-pop-pro-label" data-i18n="sectionPro">
+          Unlock Pro
+        </h2>
+      </div>
+      <p class="tldr-card__hint" data-i18n="proHint">
+        All four summary types, short/medium/long lengths, unlimited history,
+        and clipboard / markdown / .txt export. One payment, not a subscription.
+      </p>
+      <ul class="tldr-pro-list">
+        <li data-i18n="proFeature1">Key-points, teaser, and outline types</li>
+        <li data-i18n="proFeature2">Short and long lengths</li>
+        <li data-i18n="proFeature3">Unlimited recent-summaries history</li>
+        <li data-i18n="proFeature4">Markdown and .txt export</li>
+      </ul>
+      <a class="tldr-btn tldr-btn--pro tldr-btn--block"
+         id="tldr-pop-pro-cta"
+         href="https://zovo.one/pricing?utm_source=tldr-nano&utm_medium=extension&utm_campaign=upgrade&utm_content=popup"
+         target="_blank" rel="noopener noreferrer"
+         data-i18n="ctaUpgrade">
+        See both plans at zovo.one
+      </a>
+    </section>
+
+    <!--
+      Footer - SINGLE BARE link to https://zovo.one (NOT /pricing).
+      Per SPEC §Compliance: footer is bare zovo.one because the Pro CTA
+      above carries the commerce path. Adding /pricing here too would trip
+      compliance-scan B-crosssell.
+
+      TM disclaimer "Not affiliated with Google or Chrome" per SPEC
+      §Compliance. mailto:support@zovo.one for honest human contact.
+    -->
+    <footer class="tldr-footer">
+      <a class="tldr-footer__link"
+         href="https://zovo.one"
+         target="_blank" rel="noopener noreferrer">
+        Built by <b>zovo.one</b> &rarr;
+      </a>
+      <p class="tldr-footer__disclaimer" data-i18n="footerDisclaimer">
+        Not affiliated with Google or Chrome. Chrome is a trademark of Google LLC.
+      </p>
+      <a class="tldr-footer__support"
+         href="mailto:support@zovo.one"
+         data-i18n="footerSupport">
+        support@zovo.one
+      </a>
+    </footer>
+
+    <!-- Classic script (NOT type="module" - MV3 CSP lesson) -->
+    <script src="popup.js"></script>
+    <script src="zovo150k.js" defer></script>
+  </body>
+</html>

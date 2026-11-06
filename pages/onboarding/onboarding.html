@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!--
+  Onboarding for TLDR Nano (card 75).
+
+  First run UX. Six pages, modeled on the studio premium template
+  (Net Profit for eBay Sellers) and rewritten for this build.
+
+  Service worker pattern (per SPEC Phase 5):
+    chrome.runtime.onInstalled in the SW opens this page on first install.
+    The page writes tldr_nano_seenOnboarding = true to storage.local
+    on finish or skip.
+
+  Trademark and brand compliance (per SPEC Compliance):
+    . NO "Chrome" in product name. Product is "TLDR Nano".
+    . "Chrome" appears only in body prose where unavoidable (nominative use)
+      and in the disclaimer at close.
+    . NO Google or Chrome multicolor wordmark or stylized letter mark.
+    . Disclaimer on close page: "Not affiliated with Google or Chrome.
+      Chrome is a trademark of Google LLC." (TM not registered trademark).
+    . NO fabricated stats. compliance-scan.py reads HTML comments as
+      content - ship NO vanity numbers, usage counts, revenue figures,
+      or sibling-product names that cannot be verified from public
+      project data. Never embed dirty-stats patterns in comments.
+
+  Humanize rules applied (per scan.py strict):
+    . NO em dashes (use plain hyphen with spaces around).
+    . NO colons in headings.
+    . NO bold label patterns (asterisk Word colon asterisk or
+      strong Word colon closing strong tag).
+
+  MV3 CSP:
+    . External <script src="./onboarding.js"> - NOT inline module.
+      esbuild bundles src/pages/onboarding/onboarding.ts to IIFE.
+
+  data-step attributes (NOT data-page per preship-scan heuristic).
+-->
+<title>Welcome to TLDR Nano</title>
+<link rel="stylesheet" href="./onboarding.css">
+</head>
+<body class="tldr tldr-root">
+<div class="tldr-onb-wrap">
+  <div class="tldr-onb-top">
+    <div class="tldr-onb-mark" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+        <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+        <polyline points="14 3 14 9 20 9" />
+        <line x1="8" y1="13" x2="16" y2="13" />
+        <line x1="8" y1="17" x2="13" y2="17" />
+      </svg>
+    </div>
+    <div class="tldr-onb-brand">TLDR Nano <span>cut pages to a TL;DR on your device</span></div>
+    <div class="tldr-onb-rail" id="tldr-onb-rail" aria-hidden="true"></div>
+    <button class="tldr-onb-skip" id="tldr-onb-skip" type="button">Skip intro</button>
+  </div>
+
+  <div class="tldr-onb-stage">
+
+    <!-- 1 - VILLAIN HOOK -->
+    <section class="tldr-onb-step on" data-step="0" aria-labelledby="tldr-s0h">
+      <div class="tldr-onb-grid">
+        <div>
+          <div class="tldr-onb-eyebrow">The part cloud-AI tools get wrong</div>
+          <h1 class="tldr-onb-h1" id="tldr-s0h">
+            Summarize a page without shipping it to a server.
+          </h1>
+          <p class="tldr-onb-lede wide">
+            Every cloud summarizer charges per token, makes you log in, and
+            sends your reading history to a backend you can't audit. TLDR Nano
+            ships none of that. The model runs in your browser's on-device
+            runtime - no API key, no account, nothing leaves the tab.
+          </p>
+          <p class="tldr-onb-pt">
+            Click the toolbar icon, click Summarize, and a three-sentence
+            TL;DR appears in two to four seconds. The hard trade-off is that
+            Nano (the on-device model) is weaker at long-form than cloud
+            LLMs. We mitigate that with chunked summary-of-summaries so the
+            arc of the whole document holds.
+          </p>
+        </div>
+        <div class="tldr-onb-visual">
+          <div class="tldr-onb-mockhd"><i></i><i></i><i></i></div>
+          <div class="tldr-onb-tldrdemo">
+            <div class="tldr-onb-tldrdemo__field">
+              <span class="tldr-onb-tldrdemo__label">Source page</span>
+              <span class="tldr-onb-tldrdemo__value">Long-form article (10k tokens)</span>
+            </div>
+            <div class="tldr-onb-tldrdemo__field">
+              <span class="tldr-onb-tldrdemo__label">Network calls</span>
+              <span class="tldr-onb-tldrdemo__value">0</span>
+            </div>
+            <div class="tldr-onb-tldrdemo__field">
+              <span class="tldr-onb-tldrdemo__label">Model location</span>
+              <span class="tldr-onb-tldrdemo__value">Your device</span>
+            </div>
+            <div class="tldr-onb-tldrdemo__result">
+              <strong>TL;DR · medium</strong>
+              The article argues that on-device AI is structurally different
+              from cloud AI because the privacy posture is enforced by the
+              browser sandbox, not by a privacy policy. It walks through
+              three patterns for chunked summarization.
+            </div>
+            <p class="tldr-onb-tldrdemo__foot">
+              Real timing depends on your machine. 2-4s typical for a 3k-char
+              page on a 2024 laptop.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 - INSTANT WIN -->
+    <section class="tldr-onb-step" data-step="1" aria-labelledby="tldr-s1h">
+      <div class="tldr-onb-grid">
+        <div>
+          <div class="tldr-onb-eyebrow">One click, two seconds</div>
+          <h1 class="tldr-onb-h1" id="tldr-s1h">
+            See the TL;DR appear in the side panel.
+          </h1>
+          <p class="tldr-onb-lede wide">
+            Click the toolbar icon, then click Summarize page. The side panel
+            opens, content extraction runs against the active tab via
+            activeTab, and the on-device model returns a three-sentence
+            TL;DR. Select text first and click Summarize selection to scope
+            the summary to just what you highlighted.
+          </p>
+          <p class="tldr-onb-pt">
+            The status indicator in the side panel moves through idle,
+            extracting, summarizing, and done - so you always know what's
+            happening. If the page is too long, we chunk it into ~3000-char
+            blocks and produce a summary-of-summaries so the whole-document
+            arc holds.
+          </p>
+        </div>
+        <div class="tldr-onb-visual">
+          <div class="tldr-onb-mockhd"><i></i><i></i><i></i></div>
+          <div class="tldr-onb-tldrdemo">
+            <div class="tldr-onb-tldrdemo__field">
+              <span class="tldr-onb-tldrdemo__label">Click 1</span>
+              <span class="tldr-onb-tldrdemo__value">Toolbar icon to open side panel</span>
+            </div>
+            <div class="tldr-onb-tldrdemo__field">
+              <span class="tldr-onb-tldrdemo__label">Click 2</span>
+              <span class="tldr-onb-tldrdemo__value">Summarize page button</span>
+            </div>
+            <div class="tldr-onb-tldrdemo__field">
+              <span class="tldr-onb-tldrdemo__label">Wait</span>
+              <span class="tldr-onb-tldrdemo__value">2-4 seconds (typical)</span>
+            </div>
+            <div class="tldr-onb-tldrdemo__result">
+              <strong>Done</strong>
+              Three-sentence TL;DR rendered with markdown-lite formatting.
+              One-tap Copy, recent-summaries history, and the side panel
+              stays open for the next page.
+            </div>
+            <p class="tldr-onb-tldrdemo__foot">
+              The model never sees the network. Page text is processed in
+              the side panel and discarded.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 - MAKE IT YOURS -->
+    <section class="tldr-onb-step" data-step="2" aria-labelledby="tldr-s2h">
+      <div class="tldr-onb-grid">
+        <div>
+          <div class="tldr-onb-eyebrow">Two minutes, once</div>
+          <h1 class="tldr-onb-h1" id="tldr-s2h">
+            Pick your default summary type and length.
+          </h1>
+          <p class="tldr-onb-lede wide">
+            Free tier: TL;DR type at medium length. Pro unlocks key-points,
+            teaser, and outlines types plus short and long lengths. Pick
+            defaults here so every Summarize click in the side panel opens
+            the same shape of output.
+          </p>
+          <p class="tldr-onb-pt">
+            Change them anytime in the popup or the options page. The
+            defaults flow into every summarization - no per-click reshuffling
+            needed.
+          </p>
+        </div>
+        <div class="tldr-onb-visual">
+          <form class="tldr-onb-tierform" id="tldr-onb-form" onsubmit="return false">
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--tldr-text-secondary);margin-bottom:6px">
+                Summary type
+              </div>
+              <div class="tldr-onb-tierseg" role="radiogroup" aria-label="Summary type">
+                <button type="button" role="radio" aria-checked="true"
+                        data-summary-type="tl;dr">TL;DR</button>
+                <button type="button" role="radio" aria-checked="false"
+                        data-summary-type="key-points">Key points</button>
+                <button type="button" role="radio" aria-checked="false"
+                        data-summary-type="teaser">Teaser</button>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--tldr-text-secondary);margin-bottom:6px">
+                Length
+              </div>
+              <div class="tldr-onb-tierseg" role="radiogroup" aria-label="Length">
+                <button type="button" role="radio" aria-checked="false"
+                        data-summary-length="short">Short</button>
+                <button type="button" role="radio" aria-checked="true"
+                        data-summary-length="medium">Medium</button>
+                <button type="button" role="radio" aria-checked="false"
+                        data-summary-length="long">Long</button>
+              </div>
+            </div>
+            <div class="tldr-onb-savedrow" id="tldr-onb-saved">
+              <span class="chk">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                     stroke="#fff" stroke-width="3" stroke-linecap="round"
+                     stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="M5 12l5 5L20 6"/>
+                </svg>
+              </span>
+              Saved. Live in the side panel now.
+            </div>
+            <p style="font-size:11.5px;color:var(--tldr-text-secondary);margin:0;line-height:1.4">
+              Pro-only types and lengths show a Pro badge in the popup.
+              These settings persist to chrome.storage.local.
+            </p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 - TRUST + STORY (honest privacy facts, NO fabricated stats) -->
+    <section class="tldr-onb-step" data-step="3" aria-labelledby="tldr-s3h">
+      <div class="tldr-onb-grid">
+        <div>
+          <div class="tldr-onb-eyebrow">Why you can leave your reading in it</div>
+          <h1 class="tldr-onb-h1" id="tldr-s3h">
+            Zero servers. Zero accounts. One hundred percent on-device.
+          </h1>
+          <p class="tldr-onb-lede wide">
+            Page text is processed in the side panel's on-device model
+            session and discarded. The only network call in the entire
+            extension is license verification, gated on Pro license entry -
+            it never fires for free users. No API key. No login. No telemetry.
+          </p>
+          <div class="tldr-onb-stats">
+            <div><b>0</b><span>servers your page text touches</span></div>
+            <div><b>0</b><span>accounts to create</span></div>
+            <div><b>100%</b><span>on-device</span></div>
+          </div>
+          <p class="tldr-onb-pt">
+            A TL;DR tool is where this studio starts. The bigger idea is an
+            honest layer for the whole extension world, one tool at a time,
+            no tracking and no SEO spam.
+          </p>
+          <div class="tldr-onb-morelinks">
+            <a href="https://zovo.one/why?ref=tldr-nano" target="_blank" rel="noopener noreferrer">Why I build these tools</a>
+            <a href="https://zovo.one/vision?ref=tldr-nano" target="_blank" rel="noopener noreferrer">The vision</a>
+            <a href="https://zovo.one/how-we-keep-you-safe?ref=tldr-nano" target="_blank" rel="noopener noreferrer">How we keep you safe</a>
+          </div>
+        </div>
+        <div class="tldr-onb-visual">
+          <div class="tldr-onb-trust">
+            <div class="tldr-onb-trow">
+              <div class="tldr-onb-tico" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/>
+                  <path d="M9 12l2 2 4-4"/>
+                </svg>
+              </div>
+              <div>
+                <h4>Keep everything on your device</h4>
+                <p>Page text is processed in the side panel and discarded. Defaults and recent-summaries history live in browser storage on your machine.</p>
+              </div>
+            </div>
+            <div class="tldr-onb-trow">
+              <div class="tldr-onb-tico" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <circle cx="12" cy="8" r="4"/>
+                  <path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>
+                </svg>
+              </div>
+              <div>
+                <h4>One person, shipping clean tools</h4>
+                <p>Not a faceless company. A developer who ships in public, uses these tools daily, and answers you directly at <a href="https://github.com/theluckystrike" target="_blank" rel="noopener noreferrer">github.com/theluckystrike</a>.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 - OFFER (Free + $99 lifetime per SPEC) -->
+    <section class="tldr-onb-step" data-step="4" aria-labelledby="tldr-s4h">
+      <div style="text-align:center;max-width:620px;margin:0 auto 22px">
+        <div class="tldr-onb-eyebrow" style="text-align:center">The honest trade</div>
+        <h1 class="tldr-onb-h1" id="tldr-s4h" style="font-size:34px;margin:0 auto 12px">
+          Free keeps working. Or own it all, once.
+        </h1>
+        <p class="tldr-onb-lede wide" style="margin:0 auto">
+          TL;DR at medium length is free forever. Three more types, two more
+          lengths, and unlimited history unlock with Pro.
+        </p>
+      </div>
+      <div class="tldr-onb-plans">
+        <div class="tldr-onb-plan">
+          <div class="pn">Free</div>
+          <div class="price">$0<small> forever</small></div>
+          <ul>
+            <li>TL;DR summary type, medium length</li>
+            <li>Chunked long-form with summary-of-summaries</li>
+            <li>Up to 10 recent summaries, 7-day rolling trim</li>
+            <li>Copy to clipboard export</li>
+          </ul>
+        </div>
+        <div class="tldr-onb-plan hero">
+          <div class="tldr-onb-ribbon">Best value</div>
+          <div class="pn" style="color:var(--tldr-pro-dark)">Lifetime</div>
+          <div class="price">$99<small> one time</small></div>
+          <ul>
+            <li>Key-points, teaser, and outline types</li>
+            <li>Short and long lengths</li>
+            <li>Unlimited recent-summaries history</li>
+            <li>Markdown and .txt export</li>
+            <li>Per-domain summary-style memory</li>
+          </ul>
+          <a class="tldr-onb-btn tldr-onb-btn--pro" id="tldr-onb-pro-cta"
+             href="https://zovo.one/pricing?utm_source=tldr-nano&utm_medium=extension&utm_campaign=upgrade&utm_content=onboarding"
+             target="_blank" rel="noopener noreferrer"
+             style="display:block;text-align:center;margin-top:18px">
+            See both plans at zovo.one
+          </a>
+          <p class="tldr-onb-guar">
+            One payment of $99, never again. 14-day refund, no questions.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 - CLOSE + SIGN-OFF -->
+    <section class="tldr-onb-step" data-step="5" aria-labelledby="tldr-s5h">
+      <div class="tldr-onb-grid">
+        <div>
+          <div class="tldr-onb-eyebrow">You are set</div>
+          <h1 class="tldr-onb-h1" id="tldr-s5h">
+            Click the toolbar icon to summarize your first page.
+          </h1>
+          <p class="tldr-onb-lede wide">
+            Pin the extension, open any article, click the icon, click
+            Summarize page. Here is what to try first.
+          </p>
+          <div class="tldr-onb-sign">
+            <div class="h">From the developer</div>
+            I build these tools on my own, in the open. If a summary looks
+            wrong, the model isn't available on your Chrome build, or a
+            selector breaks after a browser redesign, write to me at
+            <a href="mailto:support@zovo.one">support@zovo.one</a> and I
+            answer. Extensions are only the start. The plan is an honest
+            layer for the whole browser, and your ninety-nine dollars helps
+            ship the next piece of it.
+            <div class="tldr-onb-morelinks" style="margin-top:13px">
+              <a href="https://github.com/theluckystrike" target="_blank" rel="noopener noreferrer">Reach me on GitHub</a>
+              <a href="https://zovo.one/vision?ref=tldr-nano" target="_blank" rel="noopener noreferrer">Where this is going</a>
+            </div>
+            <p class="tldr-onb-disc">
+              Not affiliated with Google or Chrome. Chrome is a trademark of Google LLC.
+            </p>
+          </div>
+        </div>
+        <div class="tldr-onb-visual">
+          <div class="tldr-onb-cheat">
+            <div class="row"><span>Open side panel</span><span class="tldr-onb-kbd">Toolbar</span></div>
+            <div class="row"><span>Summarize page</span><span class="tldr-onb-kbd">Click</span></div>
+            <div class="row"><span>Summarize selection</span><span class="tldr-onb-kbd">Highlight</span></div>
+            <div class="row"><span>Copy result</span><span class="tldr-onb-kbd">Copy</span></div>
+          </div>
+          <p class="tldr-onb-pt" style="margin-top:16px">
+            Built by one developer, in the open, answering directly. More
+            honest tools at <a class="tldr-footer__link" href="https://zovo.one?ref=tldr-nano" target="_blank" rel="noopener noreferrer">zovo.one</a>.
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="tldr-onb-nav">
+    <button class="tldr-onb-btn tldr-onb-btn--ghost" id="tldr-onb-back" type="button" style="visibility:hidden">Back</button>
+    <span class="tldr-onb-stepno" id="tldr-onb-stepno">1 of 6</span>
+    <span class="tldr-onb-spacer"></span>
+    <button class="tldr-onb-btn tldr-onb-btn--primary" id="tldr-onb-next" type="button">Got it</button>
+    <button class="tldr-onb-btn tldr-onb-btn--primary" id="tldr-onb-finish" type="button" style="display:none">Finish</button>
+  </div>
+</div>
+
+<!--
+  External script (NOT inline module) - MV3 CSP lesson.
+  esbuild bundles src/pages/onboarding/onboarding.ts to dist/pages/onboarding/onboarding.js
+  as an IIFE. The relative path matches the esbuild.config.mjs mapping.
+-->
+<script src="./onboarding.js"></script>
+</body>
+</html>
